@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Message from './message';
 import { useSelector, useDispatch } from 'react-redux';
-import { sendMessage } from './actions.js';
+import { sendMessage } from '../../actions.js';
 
 const ChatBox = (props) => {
     const { name } = props;
