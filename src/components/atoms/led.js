@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Led = (props) => {
-    const { online = false, color = online ? 'green' : 'red' } = props;
+    const { color = 'white' } = props;
     const style = {
         'background-color': color
     };

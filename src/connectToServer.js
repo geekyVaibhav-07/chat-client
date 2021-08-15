@@ -1,4 +1,5 @@
 import { io } from 'socket.io-client';
+import appActions from './redux/actions/appActions';
 
 class ConnectionManager {
     constructor() {
@@ -7,39 +8,36 @@ class ConnectionManager {
         this.options = {
             transports: [ 'polling', 'websocket' ],
         }
+        this.eventsToRespond = [ 'SERVER_CONENCTED', 'NOT_AUTHENTICATED', 'AUTHENTICATED', 'RECEIVE_MESSAGE', 'SEND_MESSAGE' ];
         this.socket = {};
     }
 
-    receiveMessage = (message) => {
-        console.log(message)
-        if (this.dispatcher) {
-            this.dispatcher({
-                type: 'RECEIVE_MESSAGE',
-                payload: message
-            });
-        }
-    }
-
-    connect = (callBacks) => {
+    connect = (callBacks, dispatcher) => {
         if(this.socket.connected || this.socket.disconnected) {
             this.socket.connect();
         } else {
+            this.dispatcher = dispatcher;
             this.options.query = this.query;
             this.socket = io(this.url, this.options);
-            this.socket.on('connect', () => callBacks(this.socket));
-            this.socket.on('connect_error', () => callBacks(this.socket));
-            this.socket.on('disconnect', () => callBacks(this.socket));
-            this.socket.on('receiveMessage', this.receiveMessage);
+            // this.socket.on('connect', () => callBacks(this.socket));
+            // this.socket.on('connect_error', () => callBacks(this.socket));
+            // this.socket.on('disconnect', () => callBacks(this.socket));
+            this.eventsToRespond.forEach((customEvent) => {
+                this.socket.on(customEvent, (payload) =>  this.eventCatcher(customEvent, payload));
+            });
         }
+        return this.socket;
+    }
+
+    eventCatcher = (customEvent, payload) => {
+        appActions.catchEvent(this.dispatcher, {
+            payload,
+            event: customEvent
+        });
     }
 
     disconnect = () => {
-        this.socket.disconnect();
-    }
-
-    emitEvent = (customEvent, messageObject) =>{
-        this.socket.emit(customEvent, messageObject);
-        console.log(customEvent, messageObject);
+        return this.socket.disconnect();
     }
 
     setQuery = (q) => {
