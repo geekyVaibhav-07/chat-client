@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ChatBox from './chatBox';
-import ConnectionStatus from './conenctionStatus';
+import ChatBox from './components/molecules/chatBox';
+import Status from './components/atoms/led';
+import Header from './components/molecules/header';
 import Profile from './profile';
 import './App.css';
 
@@ -52,9 +53,10 @@ function App() {
 
     return (
         <div className="App">
+            <Header />
             <Profile />
             <button onClick={handleConenctionRequest} > {startButtonText} </button>
-            <ConnectionStatus isOnline={connectionStatus} />
+            <Status online={connectionStatus} />
             <input type='text' value={peer} onChange={handlePeer} />
             <button onClick={handleChatBoxPeer} > Start Chat With </button>
             {chat}
